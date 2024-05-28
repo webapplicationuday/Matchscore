@@ -34,6 +34,14 @@ const convertDbObjectToResponseObject = (dbObject) => {
   };
 };
 
+const convertDbObjectToResponseObject2 = (dbObject) => {
+  return {
+    matchId: dbObject.match_id,
+    match: dbObject.match,
+    year: dbObject.year,
+  };
+};
+
 app.get("/players/", async (request, response) => {
   const getPlayerQuery = `
  SELECT
@@ -45,6 +53,7 @@ app.get("/players/", async (request, response) => {
     playerArray.map((eachState) => convertDbObjectToResponseObject(eachState))
   );
 });
+
 //// get playerId
 app.get("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
@@ -76,4 +85,36 @@ app.put("/players/:playerId/", async (request, response) => {
       player_id = ${playerId};`;
   await db.run(updatePlayerQuery);
   response.send("Player Details Updated");
+});
+
+//// get matchId
+app.get("/matches/:matchId/", async (request, response) => {
+  const { matchId } = request.params;
+  const getOneMatchQuery = `
+    SELECT
+      *
+    FROM
+    match_details
+    WHERE
+      match_id = ${matchId};`;
+  const match = await db.get(getOneMatchQuery);
+  response.send(convertDbObjectToResponseObject2(match));
+});
+
+
+/// Get matchPlayer 
+
+app.get("/players/:playerId/matches", async (request, response) => {
+  const { playerId } = request.params;
+  const getOneMatchQuery = `
+    SELECT
+      *
+    FROM
+    player_match_score 
+    NATURAL JOIN 
+    match_details
+    WHERE
+      player_id = ${playerId};`;
+  const match = await db.get(getOneMatchQuery);
+  response.send(convertDbObjectToResponseObject2(match));
 });
