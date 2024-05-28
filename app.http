@@ -13,4 +13,9 @@ Content-Type: application/json
 
 {
   "playerName": "Raju"
-} 
+}  
+
+
+##### 
+
+GET http://localhost:3000/matches/18/ 
